@@ -2,6 +2,10 @@
 
 An elegant dark academia-themed iOS app for book lovers, featuring beautiful typography and immersive reading experiences.
 
+## Screen shots 
+![Dark][/screenshots/dark] 
+![Light][/screenshots/light]
+
 ## Features
 
 ### 🏠 Home Feed
