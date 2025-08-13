@@ -2,9 +2,29 @@
 
 An elegant dark academia-themed iOS app for book lovers, featuring beautiful typography and immersive reading experiences.
 
-## Screen shots 
-![Dark][/screenshots/dark] 
-![Light][/screenshots/light]
+## Screenshots
+
+### Dark Theme
+![Home Screen Dark](screenshots/dark/home.png)
+![Home 2 Screen Dark](screenshots/dark/home2.png)
+![Clubs Dark](screenshots/dark/clubs.png)
+![Bookshelf Dark](screenshots/dark/bookshelf.png)
+![Chat Dark](screenshots/dark/chat.png)
+![Profile-Stats Dark](screenshots/dark/profile-stats.png)
+![Profile-Achievements Dark](screenshots/dark/profile-achievements.png)
+![Profile-Creations Dark](screenshots/dark/profile-creations.png)
+![Profile-Settings Dark](screenshots/dark/profile-settings.png)
+
+### Light Theme  
+![Home Screen Light](screenshots/light/home.png)
+![Home 2 Screen Light](screenshots/light/home2.png)
+![Clubs Light](screenshots/light/clubs.png)
+![Bookshelf Light](screenshots/light/bookshelf.png)
+![Chat Light](screenshots/light/chat.png)
+![Profile-Stats Light](screenshots/light/profile-stats.png)
+![Profile-Achievements Light](screenshots/light/profile-achievements.png)
+![Profile-Creations Light](screenshots/light/profile-creations.png)
+![Profile-Settings Light](screenshots/light/profile-settings.png)
 
 ## Features
 
@@ -47,18 +67,6 @@ The Enchanted Quill embraces **Dark Academia** aesthetics with:
 - Elegant typography using custom fonts (Beachwood, Beachwood Sans, Parisienne)
 - Sophisticated layouts inspired by classic libraries
 - Ambient lighting effects and subtle gradients
-
-## Screenshots
-
-### Dark Theme
-![Home Screen Dark](screenshots/home-dark.png)
-![Bookshelf Dark](screenshots/bookshelf-dark.png)
-![Profile Dark](screenshots/profile-dark.png)
-
-### Light Theme  
-![Home Screen Light](screenshots/home-light.png)
-![Bookshelf Light](screenshots/bookshelf-light.png)
-![Profile Light](screenshots/profile-light.png)
 
 ## Build & Run Instructions
 
