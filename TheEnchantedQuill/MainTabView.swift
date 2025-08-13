@@ -56,7 +56,7 @@ struct MainTabView: View {
             ChatScreen(userEmail: userEmail)
                 .tabItem {
                     Image(systemName: "message")
-                    Text("Chat")
+                    Text("Chats")
                 }
             
             // Profile Tab

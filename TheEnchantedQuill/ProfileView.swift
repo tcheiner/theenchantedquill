@@ -274,31 +274,145 @@ struct CreationsTabView: View {
 
 struct SettingsTabView: View {
     @Environment(\.colorScheme) var colorScheme
+    @State private var displayName: String = "Reader"
+    @State private var notificationsEnabled: Bool = true
+    @State private var showingDeleteConfirmation: Bool = false
+    @State private var showingAvatarPicker: Bool = false
+    @State private var selectedAvatar: String = "person.crop.circle.fill"
     
     private var onSurfaceColor: Color {
         colorScheme == .dark ? Color.DarkAcademia.onSurface : Color.LightAcademia.onSurface
     }
     
+    private var surfaceContainerColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.surfaceContainer : Color.LightAcademia.surfaceContainer
+    }
+    
+    private var goldColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.quillGold : Color.LightAcademia.quillGold
+    }
+    
+    private let avatarOptions = [
+        "person.crop.circle.fill",
+        "person.crop.circle.badge.book.fill",
+        "graduationcap.fill",
+        "book.closed.fill",
+        "character.book.closed.fill",
+        "pencil.and.outline",
+        "quill.and.papyrus.fill"
+    ]
+    
     var body: some View {
-        VStack(spacing: 30) {
-            Text("Account Settings")
-                .font(.custom("Beachwood Sans", size: 20))
-                .fontWeight(.semibold)
-                .foregroundColor(onSurfaceColor)
-            
-            Text("Manage your account preferences, privacy settings, and app configurations.")
-                .font(.body)
-                .foregroundColor(onSurfaceColor.opacity(0.8))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-            
-            Image(systemName: "gearshape.fill")
-                .font(.system(size: 60))
-                .foregroundColor(onSurfaceColor.opacity(0.3))
-            
-            Spacer(minLength: 100)
+        ScrollView {
+            VStack(spacing: 25) {
+                Text("Account Settings")
+                    .font(.custom("Beachwood Sans", size: 20))
+                    .fontWeight(.semibold)
+                    .foregroundColor(onSurfaceColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                
+                // Profile Section
+                SettingsSection(title: "Profile") {
+                    VStack(spacing: 15) {
+                        // Avatar Selection
+                        SettingsRow(
+                            icon: selectedAvatar,
+                            title: "Avatar",
+                            subtitle: "Tap to change your profile picture",
+                            showChevron: true
+                        ) {
+                            showingAvatarPicker = true
+                        }
+                        
+                        // Display Name
+                        SettingsTextFieldRow(
+                            icon: "textformat",
+                            title: "Display Name",
+                            text: $displayName
+                        )
+                    }
+                }
+                
+                // Notifications Section
+                SettingsSection(title: "Notifications") {
+                    SettingsToggleRow(
+                        icon: "bell.fill",
+                        title: "Push Notifications",
+                        subtitle: "Receive updates about new books, events, and messages",
+                        isOn: $notificationsEnabled
+                    )
+                }
+                
+                // Data Section
+                SettingsSection(title: "Data") {
+                    SettingsRow(
+                        icon: "trash.fill",
+                        title: "Delete All Data",
+                        subtitle: "Permanently remove all your data from the app",
+                        showChevron: false,
+                        isDestructive: true
+                    ) {
+                        showingDeleteConfirmation = true
+                    }
+                }
+                
+                // Legal Section
+                SettingsSection(title: "Legal") {
+                    VStack(spacing: 15) {
+                        SettingsRow(
+                            icon: "doc.text.fill",
+                            title: "Privacy Policy",
+                            subtitle: "How we protect your privacy",
+                            showChevron: true
+                        ) {
+                            openPrivacyPolicy()
+                        }
+                        
+                        SettingsRow(
+                            icon: "doc.text.fill",
+                            title: "Terms and Conditions",
+                            subtitle: "Terms of service and usage",
+                            showChevron: true
+                        ) {
+                            openTermsAndConditions()
+                        }
+                    }
+                }
+                
+                Spacer(minLength: 100)
+            }
+            .padding(.vertical, 20)
         }
-        .padding(.top, 50)
+        .sheet(isPresented: $showingAvatarPicker) {
+            AvatarPickerSheet(
+                selectedAvatar: $selectedAvatar,
+                avatarOptions: avatarOptions
+            )
+        }
+        .alert("Delete All Data", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                deleteAllData()
+            }
+        } message: {
+            Text("This action cannot be undone. All your reading progress, reviews, and personal data will be permanently deleted.")
+        }
+    }
+    
+    private func openPrivacyPolicy() {
+        // TODO: Open privacy policy (web view or in-app document)
+        print("Opening Privacy Policy")
+    }
+    
+    private func openTermsAndConditions() {
+        // TODO: Open terms and conditions (web view or in-app document)
+        print("Opening Terms and Conditions")
+    }
+    
+    private func deleteAllData() {
+        // TODO: Implement data deletion
+        print("Deleting all user data")
     }
 }
 
@@ -633,6 +747,289 @@ struct ContentItem {
         self.content = content
         self.date = date
         self.rating = rating
+    }
+}
+
+// MARK: - Settings Components
+struct SettingsSection<Content: View>: View {
+    let title: String
+    let content: Content
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var onSurfaceColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.onSurface : Color.LightAcademia.onSurface
+    }
+    
+    private var surfaceContainerColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.surfaceContainer : Color.LightAcademia.surfaceContainer
+    }
+    
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text(title)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(onSurfaceColor)
+                .padding(.horizontal, 20)
+            
+            VStack(spacing: 0) {
+                content
+            }
+            .background(surfaceContainerColor)
+            .cornerRadius(12)
+            .padding(.horizontal, 20)
+        }
+    }
+}
+
+struct SettingsRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let showChevron: Bool
+    let isDestructive: Bool
+    let action: () -> Void
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var onSurfaceColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.onSurface : Color.LightAcademia.onSurface
+    }
+    
+    private var goldColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.quillGold : Color.LightAcademia.quillGold
+    }
+    
+    init(icon: String, title: String, subtitle: String, showChevron: Bool = true, isDestructive: Bool = false, action: @escaping () -> Void) {
+        self.icon = icon
+        self.title = title
+        self.subtitle = subtitle
+        self.showChevron = showChevron
+        self.isDestructive = isDestructive
+        self.action = action
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 15) {
+                // Icon
+                Circle()
+                    .fill(isDestructive ? Color.red.opacity(0.2) : goldColor.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(systemName: icon)
+                            .font(.system(size: 18))
+                            .foregroundColor(isDestructive ? Color.red : goldColor)
+                    )
+                
+                // Content
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .foregroundColor(isDestructive ? Color.red : onSurfaceColor)
+                    
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundColor(onSurfaceColor.opacity(0.7))
+                        .multilineTextAlignment(.leading)
+                }
+                
+                Spacer()
+                
+                // Chevron
+                if showChevron {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(onSurfaceColor.opacity(0.5))
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct SettingsToggleRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    @Binding var isOn: Bool
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var onSurfaceColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.onSurface : Color.LightAcademia.onSurface
+    }
+    
+    private var goldColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.quillGold : Color.LightAcademia.quillGold
+    }
+    
+    var body: some View {
+        HStack(spacing: 15) {
+            // Icon
+            Circle()
+                .fill(goldColor.opacity(0.2))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .foregroundColor(goldColor)
+                )
+            
+            // Content
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundColor(onSurfaceColor)
+                
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(onSurfaceColor.opacity(0.7))
+                    .multilineTextAlignment(.leading)
+            }
+            
+            Spacer()
+            
+            // Toggle
+            Toggle("", isOn: $isOn)
+                .tint(goldColor)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+    }
+}
+
+struct SettingsTextFieldRow: View {
+    let icon: String
+    let title: String
+    @Binding var text: String
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var onSurfaceColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.onSurface : Color.LightAcademia.onSurface
+    }
+    
+    private var goldColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.quillGold : Color.LightAcademia.quillGold
+    }
+    
+    private var surfaceContainerHighColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.surfaceContainerHigh : Color.LightAcademia.surfaceContainerHigh
+    }
+    
+    var body: some View {
+        HStack(spacing: 15) {
+            // Icon
+            Circle()
+                .fill(goldColor.opacity(0.2))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .foregroundColor(goldColor)
+                )
+            
+            // Content
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundColor(onSurfaceColor)
+                
+                TextField("Enter \(title.lowercased())", text: $text)
+                    .textFieldStyle(DarkAcademiaTextFieldStyle())
+                    .font(.body)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+    }
+}
+
+struct AvatarPickerSheet: View {
+    @Binding var selectedAvatar: String
+    let avatarOptions: [String]
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var onSurfaceColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.onSurface : Color.LightAcademia.onSurface
+    }
+    
+    private var goldColor: Color {
+        colorScheme == .dark ? Color.DarkAcademia.quillGold : Color.LightAcademia.quillGold
+    }
+    
+    private var backgroundGradient: LinearGradient {
+        colorScheme == .dark ? LinearGradient.darkAcademiaBackground : LinearGradient.lightAcademiaBackground
+    }
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                backgroundGradient
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    Text("Choose Your Avatar")
+                        .font(.custom("Beachwood", size: 24))
+                        .foregroundColor(onSurfaceColor)
+                        .padding(.top, 20)
+                    
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible()),
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: 20) {
+                        ForEach(avatarOptions, id: \.self) { avatar in
+                            Button(action: {
+                                selectedAvatar = avatar
+                                dismiss()
+                            }) {
+                                Circle()
+                                    .fill(avatar == selectedAvatar ? goldColor.opacity(0.3) : Color.clear)
+                                    .frame(width: 80, height: 80)
+                                    .overlay(
+                                        Image(systemName: avatar)
+                                            .font(.system(size: 40))
+                                            .foregroundColor(avatar == selectedAvatar ? goldColor : onSurfaceColor)
+                                    )
+                                    .overlay(
+                                        Circle()
+                                            .stroke(avatar == selectedAvatar ? goldColor : onSurfaceColor.opacity(0.3), lineWidth: 2)
+                                    )
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    Spacer()
+                }
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(goldColor)
+                }
+            }
+        }
     }
 }
 
